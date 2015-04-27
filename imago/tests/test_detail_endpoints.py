@@ -4,7 +4,8 @@ from restless.http import HttpError
 import pytest
 import django; django.setup()
 
-from imago.views import (BillDetail, DivisionDetail, EventDetail, JurisdictionDetail, PersonDetail)
+from imago.views import (BillDetail, DivisionDetail, EventDetail, JurisdictionDetail,
+                         OrganizationDetail, PersonDetail, VoteDetail)
 
 
 @pytest.mark.django_db
@@ -38,9 +39,9 @@ class BillDetailTests(TestCase):
         content = decode_json_or_none(response.content)
         if not content:
             self.fail("Unable to decode JSON from response.content")
-        expected_field_msg = "Bill dict should only have keys '{}' (or 'debug')".format(','.join(possible_fields))
+        expected_field_msg = "Dict should only have keys '{}' (or 'debug')".format(','.join(possible_fields))
         for field in expected_fields:
-            self.assertIn(field, content, "Bill dict should have key '{}'".format(field))
+            self.assertIn(field, content, "Dict should have key '{}'".format(field))
         for r_field in content.keys():
             self.assertIn(r_field, possible_fields, expected_field_msg)
 
@@ -76,9 +77,9 @@ class DivisionDetailTests(TestCase):
         content = decode_json_or_none(response.content)
         if not content:
             self.fail("Unable to decode JSON from response.content")
-        expected_field_msg = "Division dict should only have keys '{}' (or 'debug')".format(','.join(possible_fields))
+        expected_field_msg = "Dict should only have keys '{}' (or 'debug')".format(','.join(possible_fields))
         for field in expected_fields:
-            self.assertIn(field, content, "Division dict should have key '{}'".format(field))
+            self.assertIn(field, content, "Dict should have key '{}'".format(field))
         for r_field in content.keys():
             self.assertIn(r_field, possible_fields, expected_field_msg)
 
@@ -88,6 +89,7 @@ class EventDetailTests(TestCase):
 
     def setUp(self):
         self.factory = ApiRequestFactory()
+        # FIXME: Is there a event with a stabile identifier guaranteed to exist in the db?
         self.ocd_id = 'ocd-event/001e7b51-2ccc-4f60-a83e-9172ae127a39'
 
     def test_event_object_retrievable(self):
@@ -114,9 +116,9 @@ class EventDetailTests(TestCase):
         content = decode_json_or_none(response.content)
         if not content:
             self.fail("Unable to decode JSON from response.content")
-        expected_field_msg = "Event dict should only have keys '{}' (or 'debug')".format(','.join(possible_fields))
+        expected_field_msg = "Dict should only have keys '{}' (or 'debug')".format(','.join(possible_fields))
         for field in expected_fields:
-            self.assertIn(field, content, "Event dict should have key '{}'".format(field))
+            self.assertIn(field, content, "Dict should have key '{}'".format(field))
         for r_field in content.keys():
             self.assertIn(r_field, possible_fields, expected_field_msg)
 
@@ -152,9 +154,48 @@ class JurisdictionDetailTests(TestCase):
         content = decode_json_or_none(response.content)
         if not content:
             self.fail("Unable to decode JSON from response.content")
-        expected_field_msg = "Jurisdiction dict should only have keys '{}' (or 'debug')".format(','.join(possible_fields))
+        expected_field_msg = "Dict should only have keys '{}' (or 'debug')".format(','.join(possible_fields))
         for field in expected_fields:
-            self.assertIn(field, content, "Jurisdiction dict should have key '{}'".format(field))
+            self.assertIn(field, content, "Dict should have key '{}'".format(field))
+        for r_field in content.keys():
+            self.assertIn(r_field, possible_fields, expected_field_msg)
+
+
+@pytest.mark.django_db
+class OrganizationDetailTests(TestCase):
+
+    def setUp(self):
+        self.factory = ApiRequestFactory()
+        # FIXME: Is there an organization with a stabile identifier guaranteed to exist in the db?
+        self.ocd_id = 'ocd-organization/50b0bdf1-6c55-4986-a54d-014938db8046'
+
+    def test_organization_object_retrievable(self):
+        endpoint = OrganizationDetail()
+        path = '/{}/'.format(self.ocd_id)
+        request = self.factory.get(path)
+        response = endpoint.get(request, self.ocd_id)
+        self.assertEqual(response.status_code, 200,
+                         msg="Endpoint should return a 200 response when no URL params provided")
+        content = decode_json_or_none(response.content)
+        if not content:
+            self.fail("Unable to decode JSON from response.content")
+
+    def test_organization_object_custom_fields(self):
+        endpoint = OrganizationDetail()
+        path = '/{}/'.format(self.ocd_id)
+        expected_fields = ('id', 'name', 'founding_date', 'classification')
+        possible_fields = expected_fields + ('debug',)
+        path = '{}?fields={}'.format(path, ','.join(expected_fields))
+        request = self.factory.get(path)
+        response = endpoint.get(request, self.ocd_id)
+        self.assertEqual(response.status_code, 200,
+                         msg="Endpoint should return a 200 response when no URL params provided")
+        content = decode_json_or_none(response.content)
+        if not content:
+            self.fail("Unable to decode JSON from response.content")
+        expected_field_msg = "Dict should only have keys '{}' (or 'debug')".format(','.join(possible_fields))
+        for field in expected_fields:
+            self.assertIn(field, content, "Dict should have key '{}'".format(field))
         for r_field in content.keys():
             self.assertIn(r_field, possible_fields, expected_field_msg)
 
@@ -164,6 +205,7 @@ class PersonDetailTests(TestCase):
 
     def setUp(self):
         self.factory = ApiRequestFactory()
+        # FIXME: Is there a person with a stabile identifier guaranteed to exist in the db?
         self.ocd_id = 'ocd-person/0006efa7-70bf-41a0-8b0b-4bf8f999e7c1'
 
     def test_person_object_retrievable(self):
@@ -190,8 +232,47 @@ class PersonDetailTests(TestCase):
         content = decode_json_or_none(response.content)
         if not content:
             self.fail("Unable to decode JSON from response.content")
-        expected_field_msg = "Person dict should only have keys '{}' (or 'debug')".format(','.join(possible_fields))
+        expected_field_msg = "Dict should only have keys '{}' (or 'debug')".format(','.join(possible_fields))
         for field in expected_fields:
-            self.assertIn(field, content, "Person dict should have key '{}'".format(field))
+            self.assertIn(field, content, "Dict should have key '{}'".format(field))
+        for r_field in content.keys():
+            self.assertIn(r_field, possible_fields, expected_field_msg)
+
+
+@pytest.mark.django_db
+class VoteDetailTests(TestCase):
+
+    def setUp(self):
+        self.factory = ApiRequestFactory()
+        # FIXME: Is there a vote with a stabile identifier guaranteed to exist in the db?
+        self.ocd_id = 'ocd-vote/1578dd40-d244-4edf-9bee-b640a9499dae'
+
+    def test_vote_object_retrievable(self):
+        endpoint = VoteDetail()
+        path = '/{}/'.format(self.ocd_id)
+        request = self.factory.get(path)
+        response = endpoint.get(request, self.ocd_id)
+        self.assertEqual(response.status_code, 200,
+                         msg="Endpoint should return a 200 response when no URL params provided")
+        content = decode_json_or_none(response.content)
+        if not content:
+            self.fail("Unable to decode JSON from response.content")
+
+    def test_vote_object_custom_fields(self):
+        endpoint = VoteDetail()
+        path = '/{}/'.format(self.ocd_id)
+        expected_fields = ('id', 'identifier', 'start_date', 'motion_text')
+        possible_fields = expected_fields + ('debug',)
+        path = '{}?fields={}'.format(path, ','.join(expected_fields))
+        request = self.factory.get(path)
+        response = endpoint.get(request, self.ocd_id)
+        self.assertEqual(response.status_code, 200,
+                         msg="Endpoint should return a 200 response when no URL params provided")
+        content = decode_json_or_none(response.content)
+        if not content:
+            self.fail("Unable to decode JSON from response.content")
+        expected_field_msg = "Dict should only have keys '{}' (or 'debug')".format(','.join(possible_fields))
+        for field in expected_fields:
+            self.assertIn(field, content, "Dict should have key '{}'".format(field))
         for r_field in content.keys():
             self.assertIn(r_field, possible_fields, expected_field_msg)
