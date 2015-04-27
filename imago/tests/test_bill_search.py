@@ -1,27 +1,27 @@
 from unittest import TestCase
-from django.test import RequestFactory
+from imago.tests.helpers import ApiRequestFactory, decode_json_or_none
 import pytest
 import django; django.setup()
 
 from imago.views import BillList
-
-import json
 
 
 class BillSearchTests(TestCase):
 
     def setUp(self):
         self.results_count = 10
-        self.factory = RequestFactory()
+        self.factory = ApiRequestFactory()
 
     @pytest.mark.django_db
     def test_bill_results_count(self):
         endpoint = BillList()
         request = self.factory.get('/bills/')
-        request.params = request.GET.copy()
         response = endpoint.get(request)
-        resp_obj = json.loads(response.content.decode())
-        results = resp_obj.get('results', None)
+        content = decode_json_or_none(response.content)
+        if not content:
+            self.fail("Unable to decode JSON from response.content")
+
+        results = content.get('results', None)
 
         self.assertIsNotNone(results)
         self.assertEqual(len(results), self.results_count)
