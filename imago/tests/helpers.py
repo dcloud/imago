@@ -8,7 +8,7 @@ class ApiRequestFactory(RequestFactory):
 
     def get(self, path, data=None, secure=False, **extra):
         request = super(ApiRequestFactory, self).get(path, data, secure, **extra)
-        request.params = request.GET.copy()
+        request.params = dict((k, v) for (k, v) in request.GET.items())
         request.data = None
         request.raw_data = request.body
         return request
