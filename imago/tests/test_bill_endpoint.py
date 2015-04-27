@@ -7,12 +7,12 @@ import django; django.setup()
 from imago.views import BillList
 
 
+@pytest.mark.django_db
 class BillSearchTests(TestCase):
 
     def setUp(self):
         self.factory = ApiRequestFactory()
 
-    @pytest.mark.django_db
     def test_bills_http200(self):
         endpoint = BillList()
         request = self.factory.get('/bills/')
@@ -20,7 +20,6 @@ class BillSearchTests(TestCase):
         self.assertEqual(response.status_code, 200,
                          msg="Endpoint should return a 200 response when no URL params provided")
 
-    @pytest.mark.django_db
     def test_bills_defaults(self):
         endpoint = BillList()
         request = self.factory.get('/bills/')
@@ -40,7 +39,6 @@ class BillSearchTests(TestCase):
                 for field in expected_fields:
                     self.assertIn(field, item, "Bill dict should have key '{}'".format(field))
 
-    @pytest.mark.django_db
     def test_bills_custom_fields(self):
         endpoint = BillList()
         request = self.factory.get('/bills/?fields=title,legislative_session,from_organization_id,classification')
@@ -63,7 +61,6 @@ class BillSearchTests(TestCase):
                 for r_field in item.keys():
                     self.assertIn(r_field, expected_fields, "Bill dict should only have keys '{}'".format(expected_field_str))
 
-    @pytest.mark.django_db
     def test_bills_search(self):
         endpoint = BillList()
         request = self.factory.get('/bills/?q=Wisconsin')
@@ -74,7 +71,6 @@ class BillSearchTests(TestCase):
 
         self.assertIsInstance(content, dict, "Content should be a JSON dictionary")
 
-    @pytest.mark.django_db
     def test_bills_sponsorships(self):
         endpoint = BillList()
         request = self.factory.get('/bills/?sponsorships__person__id=ocd-person/8f8aacb2-0ff7-41b9-9c69-91db22cfa818')
@@ -85,7 +81,6 @@ class BillSearchTests(TestCase):
 
         self.assertIsInstance(content, dict, "Content should be a JSON dictionary")
 
-    @pytest.mark.django_db
     def test_bills_from_organization(self):
         endpoint = BillList()
         request = self.factory.get('/bills/?from_organization_id=ocd-organization/98004f81-af38-4600-82a9-d1f23200be0b')
@@ -96,7 +91,6 @@ class BillSearchTests(TestCase):
 
         self.assertIsInstance(content, dict, "Content should be a JSON dictionary")
 
-    @pytest.mark.django_db
     def test_invalid_parameter(self):
         endpoint = BillList()
         request = self.factory.get('/bills/?sponsorships__organization__post_label__contains=foo')

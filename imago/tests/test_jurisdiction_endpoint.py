@@ -6,6 +6,7 @@ import django; django.setup()
 from imago.views import JurisdictionList
 
 
+@pytest.mark.django_db
 class TestJuridictionResource(TestCase):
 
     """Tests on JurisdictionResource api endpoint"""
@@ -13,7 +14,6 @@ class TestJuridictionResource(TestCase):
     def setUp(self):
         self.factory = ApiRequestFactory()
 
-    @pytest.mark.django_db
     def test_jurisdictions_http200(self):
         endpoint = JurisdictionList()
         request = self.factory.get('/jursidictions/')
@@ -21,7 +21,6 @@ class TestJuridictionResource(TestCase):
         self.assertEqual(response.status_code, 200,
                          msg="Endpoint should return a 200 response when no URL params provided")
 
-    @pytest.mark.django_db
     def test_jurisdictions_deserialize(self):
         endpoint = JurisdictionList()
         request = self.factory.get('/jursidictions/')
