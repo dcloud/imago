@@ -1,5 +1,6 @@
 from unittest import TestCase
 from imago.tests.helpers import ApiRequestFactory, decode_json_or_none
+from restless.http import HttpError
 import pytest
 import django; django.setup()
 
@@ -55,9 +56,12 @@ class BillSearchTests(TestCase):
             results = content.get('results')
             self.assertIsInstance(results, list, "JSON results should be a list")
             expected_fields = ('title', 'legislative_session', 'from_organization_id', 'classification')
+            expected_field_str = ", ".join(expected_fields)
             for item in results:
                 for field in expected_fields:
                     self.assertIn(field, item, "Bill dict should have key '{}'".format(field))
+                for r_field in item.keys():
+                    self.assertIn(r_field, expected_fields, "Bill dict should only have keys '{}'".format(expected_field_str))
 
     @pytest.mark.django_db
     def test_bills_search(self):
@@ -80,3 +84,29 @@ class BillSearchTests(TestCase):
             self.fail("Unable to decode JSON from response.content")
 
         self.assertIsInstance(content, dict, "Content should be a JSON dictionary")
+
+    @pytest.mark.django_db
+    def test_bills_from_organization(self):
+        endpoint = BillList()
+        request = self.factory.get('/bills/?from_organization_id=ocd-organization/98004f81-af38-4600-82a9-d1f23200be0b')
+        response = endpoint.get(request)
+        content = decode_json_or_none(response.content)
+        if not content:
+            self.fail("Unable to decode JSON from response.content")
+
+        self.assertIsInstance(content, dict, "Content should be a JSON dictionary")
+
+    @pytest.mark.django_db
+    def test_invalid_parameter(self):
+        endpoint = BillList()
+        request = self.factory.get('/bills/?sponsorships__organization__post_label__contains=foo')
+        with self.assertRaises(HttpError):
+            response = endpoint.get(request)
+            content = decode_json_or_none(response.content)
+            if not content:
+                self.fail("Unable to decode JSON from response.content")
+
+            self.assertEqual(response.status_code, 400,
+                             msg="Endpoint should return a 400 response when an invalid URL param provided")
+            self.assertIn('error', content, "Expect error in response JSON")
+
