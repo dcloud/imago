@@ -9,6 +9,7 @@ DATABASES_CONFIG['default']['TEST'] = dj_database_url.config(env='DATABASE_TEST_
 
 
 def pytest_configure():
+    print("Running using db host: '{}'".format(DATABASES_CONFIG['default']['TEST']['HOST']))
     settings.configure(
         SECRET_KEY='testit',
         DATABASES=DATABASES_CONFIG
