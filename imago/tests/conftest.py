@@ -13,7 +13,7 @@ def pytest_configure():
     settings.configure(
         INSTALLED_APPS=(
             'boundaries',
-            'opencivicdata.apps.BaseConfig',
+            'opencivicdata',
             'imago',
         ),
         SECRET_KEY='testit',
