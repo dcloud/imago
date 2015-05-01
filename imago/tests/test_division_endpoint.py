@@ -8,7 +8,7 @@ from imago.views import DivisionList
 
 
 @pytest.mark.django_db
-class DivisionSearchTests(TestCase):
+class DivisionEndpointTests(TestCase):
 
     def setUp(self):
         self.factory = ApiRequestFactory()

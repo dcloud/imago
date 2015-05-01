@@ -8,7 +8,7 @@ from imago.views import BillList
 
 
 @pytest.mark.django_db
-class BillSearchTests(TestCase):
+class BillEndpointTests(TestCase):
 
     def setUp(self):
         self.factory = ApiRequestFactory()
