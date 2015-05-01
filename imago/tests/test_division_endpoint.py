@@ -51,7 +51,7 @@ class DivisionEndpointTests(TestCase):
         if not content:
             self.fail("Unable to decode JSON from response.content")
         self.assertIsInstance(content, dict, "Content should be a JSON dictionary")
-        self.assertIn('objects', content)
+        self.assertIn('results', content)
 
     def test_divisions_filter_by_lat_lon(self):
         endpoint = DivisionList()
@@ -64,4 +64,4 @@ class DivisionEndpointTests(TestCase):
         if not content:
             self.fail("Unable to decode JSON from response.content")
         self.assertIsInstance(content, dict, "Content should be a JSON dictionary")
-        self.assertIn('objects', content)
+        self.assertIn('results', content)
