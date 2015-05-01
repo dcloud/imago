@@ -53,10 +53,10 @@ class DivisionSearchTests(TestCase):
         self.assertIsInstance(content, dict, "Content should be a JSON dictionary")
         self.assertIn('objects', content)
 
-    def test_divisiony_filter_by_lat_lon(self):
+    def test_divisions_filter_by_lat_lon(self):
         endpoint = DivisionList()
         raleigh_point = ('35.780556', '-78.638889')
-        request = self.factory.get('{}?lat&lon={point.1}={point.0}'.format(self.endpointpath, point=raleigh_point))
+        request = self.factory.get('{}?lat={point[0]}&lon={point[1]}'.format(self.endpointpath, point=raleigh_point))
         response = endpoint.get(request)
         self.assertLess(response.status_code, 500,
                         msg="Endpoint should return a non-500 response for lat/lon lookup (but could be a 404)")
