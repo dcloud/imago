@@ -71,7 +71,7 @@ class BillSearchTests(TestCase):
 
         self.assertIsInstance(content, dict, "Content should be a JSON dictionary")
 
-    def test_bills_sponsorships(self):
+    def test_bills_filter_by_sponsorships(self):
         endpoint = BillList()
         request = self.factory.get('/bills/?sponsorships__person__id=ocd-person/8f8aacb2-0ff7-41b9-9c69-91db22cfa818')
         response = endpoint.get(request)
@@ -81,7 +81,7 @@ class BillSearchTests(TestCase):
 
         self.assertIsInstance(content, dict, "Content should be a JSON dictionary")
 
-    def test_bills_from_organization(self):
+    def test_bills_filter_by_from_organization(self):
         endpoint = BillList()
         request = self.factory.get('/bills/?from_organization_id=ocd-organization/98004f81-af38-4600-82a9-d1f23200be0b')
         response = endpoint.get(request)
